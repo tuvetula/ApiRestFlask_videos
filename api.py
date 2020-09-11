@@ -7,8 +7,49 @@ from flask import (
     jsonify,
     request
 )
-from config import db , app
-from models import Video, VideoSchema
+from config import db, app
+from models import Video, VideoSchema, User, UserSchema
+
+#AUTHENTICATION
+#register
+@app.route('/api/register', methods=['POST'])
+def post():
+    # get the post data
+    post_data = request.json
+    # check if user already exists
+    user = User.query.filter_by(email=post_data[0]['email']).first()
+    if not user:
+        try:
+            #return post_data[0]['password']
+            new_user = User(
+                email=post_data[0]['email'],
+                password=post_data[0]['password']
+            )
+            # insert the user
+            db.session.add(new_user)
+            db.session.commit()
+            # generate the auth token
+            auth_token = new_user.encode_auth_token(new_user.id)
+            responseObject = {
+                'status': 'success',
+                'message': 'Successfully registered.',
+                'auth_token': auth_token.decode()
+            }
+            return make_response(jsonify(responseObject)), 201
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            responseObject = {
+                'status': 'fail',
+                'message': 'Some error occurred. Please try again.'
+            }
+            return make_response(jsonify(responseObject)), 401
+    else:
+        responseObject = {
+            'status': 'fail',
+            'message': 'User already exists. Please Log in.',
+        }
+        return make_response(jsonify(responseObject)), 202
 
 #VIDEOS
 # show list of videos
