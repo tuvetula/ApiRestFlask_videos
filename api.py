@@ -75,6 +75,36 @@ def login():
         }
         return make_response(jsonify(responseObject)), 500
 
+#get user connected
+@app.route('/api/userInfos' , methods=['GET'])
+def getUserConnected():
+    auth_token = request.headers.get('Authorization')
+    if auth_token:
+        resp = User.decode_auth_token(auth_token)
+        if not isinstance(resp, str):
+            user = User.query.filter_by(id=resp).first()
+            responseObject = {
+                'status': 'success',
+                'data': {
+                    'user_id': user.id,
+                    'email': user.email,
+                    'admin': user.admin,
+                    'registered_on': user.registered_on
+                }
+            }
+            return make_response(jsonify(responseObject)), 200
+        responseObject = {
+            'status': 'fail',
+            'message': resp
+        }
+        return make_response(jsonify(responseObject)), 401
+    else:
+        responseObject = {
+            'status': 'fail',
+            'message': 'Provide a valid auth token.'
+        }
+        return make_response(jsonify(responseObject)), 401
+
 #VIDEOS
 # show list of videos
 @app.route('/api/videos' , methods=['GET'])
