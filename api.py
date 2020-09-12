@@ -51,6 +51,30 @@ def post():
         }
         return make_response(jsonify(responseObject)), 202
 
+#login
+@app.route('/api/login' , methods=['POST'])
+def login():
+    # get the post data
+    post_data = request.json
+    try:
+        # fetch the user data
+        user = User.query.filter_by(email=post_data[0]['email']).first()
+        auth_token = user.encode_auth_token(user.id)
+        if auth_token:
+            responseObject = {
+                'status': 'success',
+                'message': 'Successfully logged in.',
+                'auth_token': auth_token.decode()
+            }
+            return make_response(jsonify(responseObject)), 200
+    except Exception as e:
+        print(e)
+        responseObject = {
+            'status': 'fail',
+            'message': 'Try again'
+        }
+        return make_response(jsonify(responseObject)), 500
+
 #VIDEOS
 # show list of videos
 @app.route('/api/videos' , methods=['GET'])
