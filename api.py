@@ -12,7 +12,7 @@ from models import Video, VideoSchema, User, UserSchema
 
 #AUTHENTICATION
 #register
-@app.route('/api/register', methods=['POST'])
+@app.route('/api/register', methods=['PUT'])
 def post():
     # get the post data
     post_data = request.json
@@ -70,21 +70,24 @@ def index():
 # create a content
 @app.route('/api/videos' , methods=['PUT'])
 def create():
-    #On vérifie si une vidéo du même nom existe déjà
-    video = Video.query.filter(Video.name == request.json[0]['name']).one_or_none()
-    if video is None:
-        name = request.json[0]['name']
-        year = request.json[0]['year']
-        genre = request.json[0]['genre_id']
-        new_video = Video(name=name,year=year,genre_id=genre)
-        #On prépare et enregistre en bdd
-        db.session.add(new_video)
-        db.session.commit()
-        # On récupère la nouvelle entrée en bdd
-        new_video_in_DB = Video.query.filter(Video.name == name).one_or_none()
-        return new_video_in_DB.to_dict()
+    if 'name' and 'year' and 'genre_id' in request.json[0]:
+        #On vérifie si une vidéo du même nom existe déjà
+        video = Video.query.filter(Video.name == request.json[0]['name']).one_or_none()
+        if video is None:
+            name = request.json[0]['name']
+            year = request.json[0]['year']
+            genre = request.json[0]['genre_id']
+            new_video = Video(name=name,year=year,genre_id=genre)
+            #On prépare et enregistre en bdd
+            db.session.add(new_video)
+            db.session.commit()
+            # On récupère la nouvelle entrée en bdd
+            new_video_in_DB = Video.query.filter(Video.name == name).one_or_none()
+            return new_video_in_DB.to_dict()
+        else:
+            abort(409,"This movie name already exist")
     else:
-        abort(409,"This movie name already exist")
+        abort(400,"The request must have name, year and genre_id fields")
 
 
 # Show one video from Videos
