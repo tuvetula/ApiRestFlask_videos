@@ -1,9 +1,10 @@
 import os
-
 from config import db
+import Models
 
-from models import Video , Genre
-
+from Models import UserModel, BlacklistTokensModel, GenreModel, VideoModel
+from Models.GenreModel import Genre
+from Models.VideoModel import Video
 
 # Data to initialize database with
 

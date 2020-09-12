@@ -34,6 +34,5 @@ db = SQLAlchemy(app)
 
 ma = Marshmallow(app)
 
-#SECRET_KEY = os.getenv('SECRET_KEY', 'my_precious')
 SECRET_KEY="\xb3\x88e\x0e\xab\xa93\x01x\x82\xd1\xe0\x1b\xb6f;\x1a\x91d\x91\xc1-I\x00"
 BCRYPT_LOG_ROUNDS = 13

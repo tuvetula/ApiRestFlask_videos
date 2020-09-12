@@ -1,5 +1,9 @@
 import flask
 import config
+import Models
+from Models.VideoModel import Video, VideoSchema
+from Models.UserModel import User, UserSchema
+from Models.BlacklistTokensModel import BlacklistToken, BlacklistTokenSchema
 from flask import (
     Flask, 
     make_response,
@@ -8,7 +12,8 @@ from flask import (
     request
 )
 from config import db, app
-from models import Video, VideoSchema, User, UserSchema
+
+
 
 #AUTHENTICATION
 #register
@@ -159,11 +164,11 @@ def update_video(video_id):
     video = Video.query.filter(Video.id == video_id).one_or_none()
     if video is None:
         abort(404,"Could not find this video with this id: {video_id}")
-    if request.json[0]['name']:
+    if 'name' in request.json[0]:
         video.name = request.json[0]['name']
-    if request.json[0]['year']:
+    if 'year' in request.json[0]:
         video.year = request.json[0]['year']
-    if request.json[0]['genre_id']:
+    if 'genre_id' in request.json[0]:
         video.genre_id = request.json[0]['genre_id']
     db.session.commit()
 
