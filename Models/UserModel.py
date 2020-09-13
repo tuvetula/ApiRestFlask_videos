@@ -1,7 +1,7 @@
 import datetime
+import jwt
 from flask import request
 from config import db , ma, bcrypt, SECRET_KEY, BCRYPT_LOG_ROUNDS
-import jwt
 from Models.BlacklistTokensModel import BlacklistToken
 
 class User(db.Model):
