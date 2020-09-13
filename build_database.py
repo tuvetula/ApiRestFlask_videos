@@ -10,20 +10,20 @@ from Models.VideoModel import Video
 
 CARTOONS = [
 
-    {'name': 'South park', 'year': '1995' , 'genre_id': 0},
+    {'name': 'South park', 'year': '1995' , 'genre_id': 1},
 
-    {'name': 'Simpsons', 'year': '1989', 'genre_id': 0},
+    {'name': 'Simpsons', 'year': '1989', 'genre_id': 1},
 
-    {'name': 'American dad','year': '2005', 'genre_id': 0}
+    {'name': 'American dad','year': '2005', 'genre_id': 1}
 
 ]
 
 MOVIES = [
-    {'name': 'La haine', 'year': '1995' , 'genre_id': 1},
+    {'name': 'La haine', 'year': '1995' , 'genre_id': 2},
 
-    {'name': 'Spun', 'year': '2002', 'genre_id': 1},
+    {'name': 'Spun', 'year': '2002', 'genre_id': 2},
 
-    {'name': 'Dikkenek','year': '2006', 'genre_id': 1}
+    {'name': 'Dikkenek','year': '2006', 'genre_id': 2}
 ]
 
 GENRES = [

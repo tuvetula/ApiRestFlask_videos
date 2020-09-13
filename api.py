@@ -109,17 +109,21 @@ def getUserConnected():
     else:
         abort(401,resp)
 
+
 #VIDEOS
 # show list of videos
 @app.route('/api/videos' , methods=['GET'])
 def index():
         resp = User.verifyToken()
-        if not isinstance(resp, str):
+        if isinstance(resp, int):
             videos = Video.query.order_by(Video.name).all()
-            result = []
-            for video in videos:
-                result.append(video.to_dict())
-            return jsonify(result)
+            if videos:
+                result = []
+                for video in videos:
+                    result.append(video.to_dict())
+                return jsonify(result)
+            else:
+                return successResponse(200,'No videos available')
         else:
             abort(401,resp)
 
@@ -155,7 +159,7 @@ def show_content_item(video_id):
     resp = User.verifyToken()
     if isinstance(resp, int):
         video = Video.query.filter(Video.id == video_id).one_or_none()
-        if video is not None:
+        if video:
             return video.to_dict()
         else:
             abort(404, 'Video not found for id: {video_id}'.format(video_id=video_id))
@@ -194,5 +198,37 @@ def delete_video(video_id):
     else:
         abort(401,resp)    
 
+#GENRES
+#Liste des genres
+@app.route('/api/genres' , methods=['GET'])
+def list_genres():
+    resp = User.verifyToken()
+    if isinstance(resp, int):
+        genres = Genres.query.order_by(Genre.name).all()
+        result = []
+        for genre in genres:
+            result.append(genre.to_dict())
+        return jsonify(result)
+    else:
+        abort(401,resp)
+
+#Voir les vidéos d'un genre
+@app.route('/api/genres/<int:genre_id>' , methods=['GET'])
+def videos_from_one_genre(genre_id):
+    resp = User.verifyToken()
+    if isinstance(resp, int):
+        videos = Video.query.filter(Video.genre_id == genre_id).all()
+        if videos:
+            if len(videos)>1:
+                result = []
+                for video in videos:
+                    result.append(video.to_dict())
+                return jsonify(result)
+            else:
+                return videos.to_dict()
+        else:
+            abort(404, 'Video not found for genre: {genre_id}'.format(genre_id=genre_id))
+    else:
+        abort(401,resp)
 app.run()
     
