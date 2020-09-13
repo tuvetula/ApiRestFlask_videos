@@ -33,6 +33,16 @@ class Genre(db.Model,SerializerMixin):
             else:
                 return genre.id
 
+    @staticmethod
+    def checkNewGenreName(new_genre):
+        if isinstance(new_genre,str):
+            new_genre = new_genre.strip().capitalize()
+            if new_genre:
+                return new_genre
+            else:
+                abort(409,'The field genre is required')
+        else:
+            abort(409,'The field genre must be a string')
 class GenreSchema(ma.SQLAlchemySchema):
 
     class Meta:

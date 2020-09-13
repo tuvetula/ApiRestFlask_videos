@@ -10,4 +10,4 @@ def successResponse(statusCode,message,token=None):
     if token:
         response['auth_token'] = token
 
-    return jsonify(response),statusCode
+    return response,statusCode

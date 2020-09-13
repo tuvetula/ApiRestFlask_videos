@@ -1,17 +1,18 @@
 import datetime
 import jwt
 from flask import request
-from config import db , ma, bcrypt, SECRET_KEY, BCRYPT_LOG_ROUNDS
+from sqlalchemy import Table, Column, Integer,ForeignKey,DateTime, String, Boolean
+from config import db , ma, bcrypt, SECRET_KEY, BCRYPT_LOG_ROUNDS, TIME_FOR_TOKEN_DAYS, TIME_FOR_TOKEN_SECONDS
 from Models.BlacklistTokensModel import BlacklistToken
 
 class User(db.Model):
     __tablename__ = "users"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    email = db.Column(db.String(255), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False)
-    registered_on = db.Column(db.DateTime, nullable=False)
-    admin = db.Column(db.Boolean, nullable=False, default=False)
+    id = Column(db.Integer, primary_key=True, autoincrement=True)
+    email = Column(db.String(255), unique=True, nullable=False)
+    password = Column(db.String(255), nullable=False)
+    registered_on = Column(DateTime, nullable=False)
+    admin = Column(Boolean, nullable=False, default=False)
 
     def __init__(self, email, password, admin=False):
         self.email = email
@@ -24,7 +25,7 @@ class User(db.Model):
     def encode_auth_token(self, user_id):
         try:
             payload = {
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=600),
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=TIME_FOR_TOKEN_DAYS, seconds=TIME_FOR_TOKEN_SECONDS),
                 'iat': datetime.datetime.utcnow(),
                 'sub': user_id
             }
