@@ -5,7 +5,7 @@ class Genre(db.Model):
 
     __tablename__ = 'genres'
 
-    genre_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String(80), index=True)
 

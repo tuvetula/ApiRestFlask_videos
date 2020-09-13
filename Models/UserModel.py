@@ -1,6 +1,8 @@
 import datetime
+from flask import request
 from config import db , ma, bcrypt, SECRET_KEY, BCRYPT_LOG_ROUNDS
 import jwt
+from Models.BlacklistTokensModel import BlacklistToken
 
 class User(db.Model):
     __tablename__ = "users"
@@ -22,7 +24,7 @@ class User(db.Model):
     def encode_auth_token(self, user_id):
         try:
             payload = {
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=60),
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=600),
                 'iat': datetime.datetime.utcnow(),
                 'sub': user_id
             }
@@ -37,12 +39,27 @@ class User(db.Model):
     @staticmethod
     def decode_auth_token(auth_token):
         try:
-            payload = jwt.decode(auth_token,SECRET_KEY)
-            return payload['sub']
+            is_blacklisted_token = BlacklistToken.check_blacklist(auth_token)
+            if is_blacklisted_token:
+                return 'Token blacklisted. Please log in again.'
+            else:
+                payload = jwt.decode(auth_token,SECRET_KEY)
+                return payload['sub']
         except jwt.ExpiredSignatureError:
             return 'Signature expired. Please log in again.'
         except jwt.InvalidTokenError:
             return 'Invalid token. Please log in again.'
+    
+    @staticmethod
+    def verifyToken():
+        auth_token = request.headers.get('Authorization')
+        if auth_token:
+            return User.decode_auth_token(auth_token)
+        else:
+            return 'Provide a auth token'
+    
+    def verifyPassword(self,hash,password):
+        return bcrypt.check_password_hash(hash,password)
 
 class UserSchema(ma.SQLAlchemySchema):
 
