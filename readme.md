@@ -10,6 +10,7 @@
     json 2.0.9
     jwt 1.7.1
     sqlalchemy_serializer
+    flask_apispec 0.10.0
 
 
 

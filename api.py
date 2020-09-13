@@ -138,7 +138,7 @@ def create():
             video = Video.query.filter(Video.name == name).one_or_none()
             if video is None:
                 year = Video.checkYear(request.json[0]['year'])
-                genre = Video.checkGenre(request.json[0]['genre'])
+                genre = Genre.checkGenre(request.json[0]['genre'])
                 new_video = Video(name=name,year=year,genre_id=genre)
                 #On prépare et enregistre en bdd
                 db.session.add(new_video)
@@ -179,7 +179,7 @@ def update_video(video_id):
         if 'year' in request.json[0]:
             video.year = Video.checkYear(request.json[0]['year'])               
         if 'genre' in request.json[0]:
-            video.genre_id = Video.checkGenre(request.json[0]['genre'])             
+            video.genre_id = Genre.checkGenre(request.json[0]['genre'])             
         db.session.commit()
         return video.to_dict()
     else:
@@ -204,7 +204,7 @@ def delete_video(video_id):
 def list_genres():
     resp = User.verifyToken()
     if isinstance(resp, int):
-        genres = Genres.query.order_by(Genre.name).all()
+        genres = Genre.query.order_by(Genre.name).all()
         result = []
         for genre in genres:
             result.append(genre.to_dict())
@@ -217,17 +217,14 @@ def list_genres():
 def videos_from_one_genre(genre_id):
     resp = User.verifyToken()
     if isinstance(resp, int):
-        videos = Video.query.filter(Video.genre_id == genre_id).all()
-        if videos:
-            if len(videos)>1:
-                result = []
-                for video in videos:
-                    result.append(video.to_dict())
-                return jsonify(result)
-            else:
-                return videos.to_dict()
+        genre = Genre.query.filter(Genre.id == genre_id).one_or_none()
+        if genre:
+            result = []
+            for video in genre.videos:
+                result.append(video.to_dict())
+            return jsonify(result)
         else:
-            abort(404, 'Video not found for genre: {genre_id}'.format(genre_id=genre_id))
+            abort(404, 'Genre not found for genre: {genre_id}'.format(genre_id=genre_id))
     else:
         abort(401,resp)
 app.run()

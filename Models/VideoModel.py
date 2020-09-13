@@ -1,24 +1,20 @@
 import datetime
 from config import db, ma , SECRET_KEY, BCRYPT_LOG_ROUNDS
+from sqlalchemy import Table, Column, Integer,ForeignKey,DateTime, String
+from sqlalchemy.orm import relationship
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy_serializer import SerializerMixin
-from Models.GenreModel import Genre
 from flask import abort
-
 
 class Video(db.Model, SerializerMixin):
     serialize_only = ('id','name','year','genre_id')
 
     __tablename__ = 'videos'
-
-    id = db.Column(db.Integer, primary_key=True)
-
-    name = db.Column(db.String(80), index=True)
-
-    year = db.Column(db.String(10))
-
-    genre_id = db.Column(db.Integer)
-
-    timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    id = Column(Integer, primary_key=True)
+    name = Column(String(80), index=True)
+    year = Column(String(10))
+    genre_id = Column(Integer , ForeignKey('genres.id'))
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
     @staticmethod
     def checkName(new_name):
@@ -39,28 +35,8 @@ class Video(db.Model, SerializerMixin):
                 return new_year.strip()
             else:
                 abort(409,'The field year must contains 4 caracters')
-                #return ErrorResponse('The field year must contains 4 caracters',409)
         else:
             abort(409,'The field year must be a string')
-            #return ErrorResponse('The field year must be a string',409)
-    
-    @staticmethod
-    def checkGenre(new_genre):
-        if isinstance(new_genre,str):
-            if new_genre:
-                genre = Genre.query.filter(Genre.name==new_genre.strip().capitalize()).one_or_none()
-                if genre is None:
-                    abort(409,'No genre matches')
-                else:
-                    return genre.id
-            else:
-                abort(409,'The field genre is required')
-        elif isinstance(new_genre,int):
-            genre = Genre.query.filter(Genre.id==new_genre).one_or_none()
-            if genre is None:
-                abort(409,'No genre matches')
-            else:
-                return genre.id
 
 
 class VideoSchema(ma.SQLAlchemySchema):
